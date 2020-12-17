@@ -53,18 +53,30 @@
         d="M839 188.6L824.4 70.8a1.9 1.9 0 00-3.8 0l-15.1 117.4.4-.2c9.9-6.4 23.9-5.9 33.1.6z"
         transform="translate(17)"
       />
-      <circle
-        class="cls-44"
-        cx="821.9"
-        cy="196.1"
-        r="22"
-        transform="translate(-3.7 133.1) rotate(-9.1)"
-      />
+      <circle class="cls-44" cx="821.9" cy="196.1" r="22" transform="translate(-3.7 133.1) rotate(-9.1)" />
     </g>
   </g>
 </template>
 
 <script>
+import gsap from 'gsap';
+
+import { mapState } from 'vuex';
+
+export default {
+  computed: {
+    ...mapState(['score']),
+  },
+  watch: {
+    score(newValue, oldValue) {
+      gsap.to('#needle', {
+        duration: 0.3,
+        rotation: newValue,
+        transformOrigin: '50% 84%',
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped></style>

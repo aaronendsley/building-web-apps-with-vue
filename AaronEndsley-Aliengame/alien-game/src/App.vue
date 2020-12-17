@@ -8,7 +8,10 @@
           option
         }}</label>
       </p>
+
+      <button @click="pickCharacter">Pick Your Character</button>
     </GameStateStart>
+    <GameStateFinish v-else-if="uiState !== 'start' && uiState !== 'characterChosen'" />
     <section v-else>
       <svg viewBox="0 -180 1628 1180" class="main">
         <defs>
@@ -19,9 +22,12 @@
             <rect class="top-clip-path" x="1131.5" y="69.5" width="406" height="473" />
           </clipPath>
         </defs>
+        <Friend />
+        <Score />
 
+        <component :is="character"></component>
         <text x="1000" y="930" style="font: normal 45px 'Recursive; text-transform: uppercase;" class="text">
-          Character Name
+          {{ character }}
         </text>
 
         <path fill="#f0959f" d="M0 842h657v192H0z" />
@@ -52,17 +58,44 @@
           />
         </g>
       </svg>
+
+      <div class="friendtalk">
+        <h3>{{ questions[questionIndex].question }}</h3>
+      </div>
+
+      <div class="zombietalk">
+        <p v-for="character in shuffle(characterChoices)" :key="character">
+          <button @click="pickQuestion(character)">
+            {{ questions[questionIndex][character] }}
+          </button>
+        </p>
+      </div>
     </section>
   </div>
 </template>
 
 <script>
+import Artist from '@/components/Artist.vue';
+import Baker from '@/components/Baker.vue';
+import Mechanic from '@/components/Mechanic.vue';
+import Friend from '@/components/Friend.vue';
+import Zombie from '@/components/Zombie.vue';
+import Score from '@/components/Score.vue';
 import { mapState } from 'vuex';
 import GameStateStart from '@/components/GameStateStart.vue';
+import GameStateFinish from '@/components/GameStateFinish.vue';
 
 export default {
   components: {
     GameStateStart,
+    GameStateFinish,
+    Artist,
+    Baker,
+    Mechanic,
+    Friend,
+    Zombie,
+    Score,
+    GameStateFinish,
   },
   data() {
     return {
@@ -71,7 +104,24 @@ export default {
   },
 
   computed: {
-    ...mapState(['uiState', 'questions', 'characterChoices', 'character']),
+    ...mapState(['uiState', 'questions', 'characterChoices', 'character', 'questionIndex', 'score']),
+  },
+
+  methods: {
+    pickCharacter() {
+      this.$store.commit('pickCharacter', this.characterInput);
+      this.$store.commit('updateUIState', 'characterChosen');
+    },
+    pickQuestion(character) {
+      this.$store.commit('pickQuestion', character);
+    },
+    shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    },
   },
 };
 </script>
